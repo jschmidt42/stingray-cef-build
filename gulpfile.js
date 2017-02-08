@@ -41,9 +41,11 @@ const mkdirp = require('mkdirp');
 
 const col = gutil.colors;
 const outputName = argv.cef.split('.').slice(0, -1).join('.');
-const outputDir = `./builds/${outputName}`;
-const buildDir = `${outputDir}/build`;
-const packageDir = `${argv.libs}/cef-${outputName}-win64-vc-14`;
+const downloadDir = `./builds/${outputName}`;
+const buildDir = `${downloadDir}/build`;
+const buildWrapperDir = path.join(buildDir, 'libcef_dll_wrapper');
+const packageDir = `${argv.libs}/cef-${outputName}-win64-vc14`;
+const packageX64Dir = path.join(packageDir, 'x64');
 const downloadUrl = `http://opensource.spotify.com/cefbuilds/cef_binary_${argv.build}_windows64.tar.bz2`;
 
 const download = function(urls){
@@ -87,10 +89,25 @@ const download = function(urls){
 	return stream;
 };
 
+const cmakeBuild = function(config) {
+	return new Promise((resolve, reject) => {
+		let cmake = exec(`cmake --build . --target libcef_dll_wrapper --config ${config}`, {
+			cwd: buildDir
+		}, (err) => {
+			if (error)
+				return reject(error);
+			resolve();
+		});
+
+		cmake.stdout.pipe(process.stdout);
+		cmake.stderr.pipe(process.stderr);
+	});
+}
+
 gulp.task('print', function() {
 	console.info('Download URL:', downloadUrl);
-	console.info('Output name:', outputName);
-	console.info('Output dir:', path.resolve(outputDir));
+	console.info('CEF Version:', outputName);
+	console.info('CEF dir:', path.resolve(downloadDir));
 	console.info('Build dir:', path.resolve(buildDir));
 	console.info('Package dir:', path.resolve(packageDir));
 	console.dir(argv);
@@ -102,7 +119,7 @@ gulp.task('download', function() {
 		//.pipe(vinylAssign({extract: true}))
 		.pipe(decompress({strip: 1}))
 		.on('end', () => process.stdout.write('\r['+col.green('gulp')+']'+' Unzipping '+'... '+ col.green('Done\r\n')))
-        .pipe(gulp.dest(outputDir));
+        .pipe(gulp.dest(downloadDir));
 });
 
 gulp.task('clean_build', function () {
@@ -111,20 +128,20 @@ gulp.task('clean_build', function () {
 		.then(() => del(packageDir))
 });
 
-gulp.task('mkdir', ['clean_build'], function () {
-	return new Promise((resolve) => mkdirp(buildDir, resolve));
-});
+gulp.task('mkdir', ['clean_build'], () => new Promise((resolve) => mkdirp(buildDir, resolve)));
 
 gulp.task('generate', ['mkdir'], function () {
-	return new Promise((resolve) => {
-		gulp.src(['**/*.cmake'], {base: outputDir})
+	return new Promise((resolve, reject) => {
+		gulp.src(['**/*.cmake'], {base: downloadDir})
     		.pipe(replace(/\/MT/g, '/MD'))
-    		.pipe(gulp.dest(`${outputDir}`))
+    		.pipe(gulp.dest(`${downloadDir}`))
     		.on('end', function () {
 
 				let cmake = exec(`cmake -G "Visual Studio 14 Win64" .. -DUSE_SANDBOX=OFF`, {
 					cwd: buildDir
 				}, function (error, stdout, stderr) {
+					if (error)
+						return reject(error);
 					resolve();
 				});
 
@@ -135,14 +152,44 @@ gulp.task('generate', ['mkdir'], function () {
 });
 
 gulp.task('build', ['generate'], function () {
-	return new Promise((resolve) => {
-		let cmake = exec(`cmake --build . --target libcef_dll_wrapper --config Release`, {
-			cwd: buildDir
-		}, resolve);
-
-		cmake.stdout.pipe(process.stdout);
-		cmake.stderr.pipe(process.stderr);
-	});
+	return Promise.all([
+		cmakeBuild('Debug'),
+		cmakeBuild('Release'),
+	]);
 });
 
-gulp.task('default', ['download', 'build']);
+gulp.task('package:base', () => gulp
+	.src([
+		path.join(downloadDir, 'LICENSE.txt'),
+		path.join(downloadDir, 'README.txt'),
+		path.join(downloadDir, 'include/**'),
+		path.join(downloadDir, 'Resources/**')
+	], {base: downloadDir})
+  	.pipe(gulp.dest(packageDir)));
+
+gulp.task('package:mkdir', () => new Promise((resolve) => mkdirp(packageX64Dir, resolve)));
+
+gulp.task('package:bin', ['package:mkdir'], () => gulp
+	.src([
+		path.join(downloadDir, 'Debug/**'),
+		path.join(downloadDir, 'Release/**')
+	], {base: downloadDir})
+  	.pipe(gulp.dest(packageX64Dir)));
+
+gulp.task('package:bin_wrapper', ['package:mkdir'], () => gulp
+	.src([
+		path.join(buildWrapperDir, 'Debug/**'),
+		path.join(buildWrapperDir, 'Release/**')
+	], {base: buildWrapperDir})
+  	.pipe(gulp.dest(packageX64Dir)));
+
+gulp.task('package:other', ['package:mkdir'], () => gulp
+	.src([
+		path.join(downloadDir, 'Resources', 'icudtl.dat')
+	], {base: path.join(downloadDir, 'Resources')})
+  	.pipe(gulp.dest(path.join(packageX64Dir, 'Debug')))
+  	.pipe(gulp.dest(path.join(packageX64Dir, 'Release'))));
+
+gulp.task('package', ['package:base', 'package:bin', 'package:bin_wrapper', 'package:other'], () => {});
+
+gulp.task('default', ['download', 'build', 'package']);

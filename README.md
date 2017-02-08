@@ -5,15 +5,22 @@ Download, build and package [CEF](https://bitbucket.org/chromiumembedded/cef) fo
 
 See https://www.stingrayengine.com for more information on Stingray.
 
-### Generate solution and Build
+### Setup build script
 
 Install NPM modules
 > npm install
+
+### Generate and build solution
 
 Run gulp build task
 > gulp download build --cef 3.2924.1564.g0ba0378
 
 Builds are downloaded from http://opensource.spotify.com/cefbuilds/index.html#windows64_builds
+
+### Generate, build and package CEF
+
+Run the following gulp tasks:
+> gulp download build package --cef 3.2924.1564.g0ba0378
 
 ### What the script is doing...
 
@@ -31,7 +38,7 @@ Builds are downloaded from http://opensource.spotify.com/cefbuilds/index.html#wi
 
 4. Build solution using cmake in Debug and Release
 
-   > cmake --build . --target libcef_dll_wrapper --config Debug|Release
+   > cmake --build . --target libcef_dll_wrapper --config Release
 
 5. Create this structure in the cef packaged destination lib folder
 
