@@ -1,9 +1,9 @@
 {
   "name": "cef_build",
   "version": "1.0.0",
-  "description": "Download, build and package CEF for Stingray",
-  "main": "cef_build.js",
+  "description": "Download, build and package CEF for the Stingray Editor",
   "scripts": {
+    "gulp": "gulp",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
