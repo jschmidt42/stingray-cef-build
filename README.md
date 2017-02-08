@@ -34,19 +34,21 @@ First we replace `/MT` compile options to `/MD` (Multithread DLL) in cmake scrip
 
 5. Create this structure in the cef packaged destination lib folder
 
+```
 +---include
 +---Resources
 \---x64
     +---Debug
     \---Release
+```
 
-5. Copy Debug/ to  x64/
-6. Copy Release/ to  x64/
-7. Copy include/ folder to lib folder
-8. Copy Resources/ to lib folder
-9. Move Resources/icudtl.dat to x64/Debug and x64/Release
-10. Copy "build\libcef_dll\Debug\libcef_dll_wrapper.lib" to x64/Debug/
-11. Copy "build\libcef_dll\Release\libcef_dll_wrapper.lib" to x64/Release/
+6. Copy Debug/ to  x64/
+7. Copy Release/ to  x64/
+8. Copy include/ folder to lib folder
+9. Copy Resources/ to lib folder
+10. Move Resources/icudtl.dat to x64/Debug and x64/Release
+11. Copy "build\libcef_dll\Debug\libcef_dll_wrapper.lib" to x64/Debug/
+12. Copy "build\libcef_dll\Release\libcef_dll_wrapper.lib" to x64/Release/
 
 ### Command Line Usages
 
