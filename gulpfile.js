@@ -38,6 +38,7 @@ const vinylPaths = require('vinyl-paths');
 const vinylAssign = require('vinyl-assign');
 const exec = require('child_process').exec;
 const mkdirp = require('mkdirp');
+const runSequence = require('run-sequence');
 
 const col = gutil.colors;
 const outputName = argv.cef.split('.').slice(0, -1).join('.');
@@ -46,7 +47,7 @@ const buildDir = `${downloadDir}/build`;
 const buildWrapperDir = path.join(buildDir, 'libcef_dll_wrapper');
 const packageDir = `${argv.libs}/cef-${outputName}-win64-vc14`;
 const packageX64Dir = path.join(packageDir, 'x64');
-const downloadUrl = `http://opensource.spotify.com/cefbuilds/cef_binary_${argv.build}_windows64.tar.bz2`;
+const downloadUrl = `http://opensource.spotify.com/cefbuilds/cef_binary_${argv.cef}_windows64.tar.bz2`;
 
 const download = function(urls){
 	var stream = through(function(file,enc,cb) {
@@ -113,10 +114,10 @@ gulp.task('print', function() {
 	console.dir(argv);
 });
 
-gulp.task('download', function() {
+gulp.task('download', function(done) {
 	return download(downloadUrl)
 		.on('end', () => process.stdout.write('['+col.green('gulp')+']'+' Unzipping '+'... '))
-		//.pipe(vinylAssign({extract: true}))
+		.pipe(vinylAssign({extract: true}))
 		.pipe(decompress({strip: 1}))
 		.on('end', () => process.stdout.write('\r['+col.green('gulp')+']'+' Unzipping '+'... '+ col.green('Done\r\n')))
         .pipe(gulp.dest(downloadDir));
@@ -192,4 +193,6 @@ gulp.task('package:other', ['package:mkdir'], () => gulp
 
 gulp.task('package', ['package:base', 'package:bin', 'package:bin_wrapper', 'package:other'], () => {});
 
-gulp.task('default', ['download', 'build', 'package']);
+gulp.task('default', function (callback) {
+	runSequence('download', 'build', 'package', callback);
+});

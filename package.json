@@ -14,7 +14,8 @@
   "author": "Jonathan Schmidt <jschmidt42@gmail.com>",
   "license": "Autodesk",
   "devDependencies": {
-    "gulp": "^3.9.1"
+    "gulp": "^3.9.1",
+    "run-sequence": "^1.2.2"
   },
   "dependencies": {
     "del": "^2.2.2",
