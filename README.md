@@ -1,7 +1,7 @@
 Stingray - Gulp CEF Build Script
 ================================
 
-Download, build and package CEF for the Stingray Editor
+Download, build and package [CEF](https://bitbucket.org/chromiumembedded/cef) for the Stingray Editor
 
 See https://www.stingrayengine.com for more information on Stingray.
 
