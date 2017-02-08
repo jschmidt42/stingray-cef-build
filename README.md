@@ -25,30 +25,30 @@ Builds are downloaded from http://opensource.spotify.com/cefbuilds/index.html#wi
 
 3. Generate solution using cmake
 
-First we replace `/MT` compile options to `/MD` (Multithread DLL) in cmake scripts.
-
-> cmake -G "Visual Studio 14 Win64" .. -DUSE_SANDBOX=OFF
+   First we replace `/MT` compile options to `/MD` (Multithread DLL) in cmake scripts.
+   > cmake -G "Visual Studio 14 Win64" .. -DUSE_SANDBOX=OFF
 
 4. Build solution using cmake in Debug and Release
-> cmake --build . --target libcef_dll_wrapper --config Debug|Release
+
+   > cmake --build . --target libcef_dll_wrapper --config Debug|Release
 
 5. Create this structure in the cef packaged destination lib folder
 
-```
-+---include
-+---Resources
-\---x64
-    +---Debug
-    \---Release
-```
+   ```
+   +---include
+   +---Resources
+   \---x64
+       +---Debug
+       \---Release
+   ```
 
-6. Copy Debug/ to  x64/
-7. Copy Release/ to  x64/
-8. Copy include/ folder to lib folder
-9. Copy Resources/ to lib folder
-10. Move Resources/icudtl.dat to x64/Debug and x64/Release
-11. Copy "build\libcef_dll\Debug\libcef_dll_wrapper.lib" to x64/Debug/
-12. Copy "build\libcef_dll\Release\libcef_dll_wrapper.lib" to x64/Release/
+   6. Copy Debug/ to  x64/
+   7. Copy Release/ to  x64/
+   8. Copy include/ folder to lib folder
+   9. Copy Resources/ to lib folder
+   10. Move Resources/icudtl.dat to x64/Debug and x64/Release
+   11. Copy "build\libcef_dll\Debug\libcef_dll_wrapper.lib" to x64/Debug/
+   12. Copy "build\libcef_dll\Release\libcef_dll_wrapper.lib" to x64/Release/
 
 ### Command Line Usages
 
