@@ -1,7 +1,7 @@
 Stingray - Gulp CEF Build Script
 ================================
 
-Download, build and package [CEF](https://bitbucket.org/chromiumembedded/cef) for the Stingray Editor
+Download, build and package [CEF](https://bitbucket.org/chromiumembedded/cef) for the Stingray Editor.
 
 See https://www.stingrayengine.com for more information on Stingray.
 
@@ -20,8 +20,9 @@ Builds are downloaded from http://opensource.spotify.com/cefbuilds/index.html#wi
 1. Download CEF standard package...
 
 2. Create cmake build folder
-> mkdir build
-> cd build
+   > mkdir build
+
+   > cd build
 
 3. Generate solution using cmake
 
