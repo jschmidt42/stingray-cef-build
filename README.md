@@ -9,11 +9,12 @@ See https://www.stingrayengine.com for more information on Stingray.
 
 Install NPM modules
 > npm install
+> npm install --global gulp-cli
 
 ### Generate and build solution
 
 Run gulp build task
-> gulp download build --cef 3.2924.1564.g0ba0378
+> gulp build --cef 3.2924.1564.g0ba0378
 
 Builds are downloaded from http://opensource.spotify.com/cefbuilds/index.html#windows64_builds
 
